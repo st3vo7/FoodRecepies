@@ -1,28 +1,21 @@
-from typing import Optional, Awaitable
-
-import tornado.ioloop
-import tornado.web
-import tornado.options
-import tornado.httpserver
-
 from tornado.options import define, options
 
 import os.path
 
-
-class MainHandler(tornado.web.RequestHandler):
-    def data_received(self, chunk: bytes) -> Optional[Awaitable[None]]:
-        pass
-
-    def get(self):
-        self.write("Hello, world")
+from db_manipulation import *
+from recipe_handlers import *
 
 
 define("port", default=8000, help="run on the given port", type=int)
 
+
 if __name__ == "__main__":
 
     tornado.options.parse_command_line()
+
+    # create tables in db
+    print("create_table()")
+    create_table()
 
     settings = {
         "template_path": os.path.join(os.path.dirname(__file__), "templates"),
