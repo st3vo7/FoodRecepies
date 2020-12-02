@@ -1,0 +1,30 @@
+{% extends "main.html" %}
+
+{% block body %}
+
+
+<body>
+
+    <form method="POST">
+        <div class="navbar">
+            <a href="http://localhost:8000/">
+               <!-- <img src="static/images/logo1.png" alt="FoodRecipes" width="60px" height="55px">-->
+            </a>
+
+            <a style="float: right;"><input type="submit" class="btn" value="Log Out" name="logout"></a>
+
+            <div style="text-align: center; height: 45px;  float: right;">
+                <p class="">{{ user }}</p>
+            </div>
+
+        </div>
+
+    </form>
+
+    <h1>List of my recipes:</h1>
+
+    <br>
+
+</body>
+
+{% end %}
