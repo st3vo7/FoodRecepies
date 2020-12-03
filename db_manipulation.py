@@ -43,7 +43,7 @@ def create_table():
         conn.execute("""
         CREATE TABLE IF NOT EXISTS ingredients (
                     ingredient_id INTEGER PRIMARY KEY,
-                    ingredient_name TEXT,
+                    ingredient_name TEXT UNIQUE,
                     unit TEXT
                     )
         """)
@@ -58,3 +58,118 @@ def create_table():
                     FOREIGN KEY (ingredient_id) REFERENCES ingredients (ingredient_id)
                     )
         """)
+
+
+def fetch_recipe_id(name, content):
+    try:
+        conn = sqlite3.connect(DB_NAME)
+    except ConnectionRefusedError as e:
+        print(e)
+    else:
+        cur = conn.cursor()
+        r = None
+        try:
+            r = cur.execute("SELECT recipe_id FROM recipes WHERE recipe_name = ? AND recipe_text = ?", (name, content))
+            r = r.fetchone()
+        except sqlite3.IntegrityError as e:
+            print("Trying to write something that already exists in db: ", e)
+        conn.commit()
+        conn.close()
+
+        return r
+
+
+def fetch_ingredient_id(ingredient, u):
+    try:
+        conn = sqlite3.connect(DB_NAME)
+    except ConnectionRefusedError as e:
+        print(e)
+    else:
+        cur = conn.cursor()
+        r = None
+        try:
+            r = cur.execute("SELECT ingredient_id FROM ingredients WHERE ingredient_name = ? AND unit = ?", (ingredient, u))
+            r = r.fetchone()
+        except sqlite3.IntegrityError as e:
+            print("Trying to write something that already exists in db: ", e)
+
+        conn.commit()
+        conn.close()
+
+        return r
+
+
+def archive_into_db(name, ingredients, content):
+
+    li = ingredients.split("\n")
+
+    try:
+        conn = sqlite3.connect(DB_NAME)
+    except ConnectionRefusedError as e:
+        print(e)
+    else:
+        cur = conn.cursor()
+        try:
+            cur.execute("INSERT INTO recipes(recipe_name, recipe_text) VALUES(?, ?)", (name, content))
+        except sqlite3.IntegrityError as e:
+            print("Trying to write something that already exists in db: ", e)
+        else:
+            conn.commit()
+            conn.close()
+
+        for l1 in li:
+            ingredient = l1[0]
+            q = l1[1]
+            u = l1[2]
+            try:
+                conn = sqlite3.connect(DB_NAME)
+            except ConnectionRefusedError as e:
+                print(e)
+            else:
+                cur = conn.cursor()
+                try:
+                    cur.execute("INSERT INTO ingredients(ingredient_name, unit) VALUES(?, ?)", (ingredient, u))
+                except sqlite3.IntegrityError as e:
+                    print("Trying to write something that already exists in db: ", e)
+                else:
+                    conn.commit()
+                    conn.close()
+                    try:
+                        r_id = fetch_recipe_id(name, content)
+                        r_id = r_id[0]
+                        print("r_id: ", r_id)
+                        i_id = fetch_ingredient_id(ingredient, u)
+                        i_id = i_id[0]
+                        print("i_id: ", i_id)
+
+                        conn = sqlite3.connect(DB_NAME)
+                    except ConnectionRefusedError as e:
+                        print(e)
+                    else:
+                        cur = conn.cursor()
+                        try:
+                            cur.execute("INSERT INTO recipe_ingredient(recipe_id, ingredient_id, quantity) VALUES(?, ?, ?)", (r_id, i_id, q))
+                        except sqlite3.IntegrityError as e:
+                            print("Trying to write something that already exists in db: ", e)
+                        else:
+                            conn.commit()
+                            conn.close()
+
+
+def get_all_recipes():
+    r = None
+    try:
+        conn = sqlite3.connect(DB_NAME)
+    except ConnectionRefusedError as e:
+        print(e)
+    else:
+        cur = conn.cursor()
+        try:
+            r = cur.execute("SELECT recipe_name, recipe_text FROM recipes")
+            r = r.fetchall()
+        except sqlite3.IntegrityError as e:
+            print("Trying to write something that already exists in db: ", e)
+        else:
+            conn.commit()
+            conn.close()
+    return r

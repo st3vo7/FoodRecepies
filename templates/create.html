@@ -1,0 +1,42 @@
+{% extends "main.html" %}
+
+{% block body %}
+
+<body>
+
+
+    <div id="create-form">
+        <form action="/create" method="POST">
+
+            <fieldset>
+                <div>
+                    <input class="" name="name" type="text" placeholder="Name of the recipe">
+                </div>
+            </fieldset>
+
+
+            <fieldset>
+                <textarea class="textbox_id" name="ingredients"  placeholder="ingredient quantity unit">
+                </textarea>
+            </fieldset>
+
+
+            <fieldset>
+                <textarea class="textbox_id" name="content"  placeholder="Text of the recipe">
+                </textarea>
+            </fieldset>
+
+
+            <input class="btn" type="submit" value="Create recipe">
+<!--            {% module xsrf_form_html() %}-->
+
+        </form>
+    </div>
+
+    <br>
+
+</body>
+
+
+
+{% end %}

@@ -1,4 +1,5 @@
 from base_handler import *
+from db_manipulation import *
 
 
 class MainHandler(BaseHandler):
@@ -15,31 +16,17 @@ class ProfileHandler(BaseHandler):
     # @tornado.web.authenticated
     def get(self):
 
-        """
-        my_db = self.settings['db']
-        collection = my_db.test
+        rx = get_all_recipes()
+        for r in rx:
+            print(r)
+        self.render('profile.html', user="", recipes=rx)
 
-        username = self.current_user
-        # print(username)
-        # print("username: " + username)
-        # find him in db
-        v1 = await do_find_one(collection, username)
-        # pprint.pprint(v1)
+    def post(self):
 
-        if v1 is not None:
-
-            # izvuci njegove vesti i renderuj ih na stranici
-            headlines = v1['headlines']
-            # pprint.pprint(headlines)
-
-            await self.render('profile.html', user=self.current_user, headlines=headlines)
-
-        else:
-            print('Unknown client.')
-        """
-        self.render('profile.html', user="")
-
-    async def post(self):
+        if self.get_argument("create", None) is not None:
+            print("create")
+            self.redirect("/create")
+            return
         """
         print('---' * 26)
         dic_data = tornado.escape.json_decode(self.request.body)
@@ -85,3 +72,31 @@ class ProfileHandler(BaseHandler):
             print("result %s" % repr(v1))
             self.write(json.dumps({'sent': id_headline}))
         """
+
+
+class CreateHandler(BaseHandler):
+
+    def get(self):
+        self.render('create.html')
+
+    def post(self):
+        # print("detected post")
+        name = None
+        ingredients = None
+        content  = None
+
+        if self.get_body_argument("name", None) is not None:
+            name = self.get_body_argument("name")
+        if self.get_body_argument("ingredients", None) is not None:
+            ingredients = self.get_body_argument("ingredients")
+        if self.get_body_argument("content", None) is not None:
+            content = self.get_body_argument("content")
+
+        print(name)
+        print(ingredients)
+        print(content)
+
+        archive_into_db(name, ingredients, content)
+
+        self.redirect("/profile")
+        return

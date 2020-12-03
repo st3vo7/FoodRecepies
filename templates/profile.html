@@ -6,12 +6,14 @@
 <body>
 
     <form method="POST">
-        <div class="navbar">
+        <div style="margin: 0 10px;">
             <a href="http://localhost:8000/">
                <!-- <img src="static/images/logo1.png" alt="FoodRecipes" width="60px" height="55px">-->
             </a>
 
-            <a style="float: right;"><input type="submit" class="btn" value="Log Out" name="logout"></a>
+            <a style="float: right; margin: 0 10px;"><input type="submit" class="btn" value="Log Out" name="logout"></a>
+
+            <a style="float: right;"><input type="submit" class="btn" value="Create new recipe" name="create"></a>
 
             <div style="text-align: center; height: 45px;  float: right;">
                 <p class="">{{ user }}</p>
@@ -20,10 +22,29 @@
         </div>
 
     </form>
+    <br>
 
     <h1>List of my recipes:</h1>
 
     <br>
+    <p style="display: none;">{{ ind = 0 }}</p>
+
+    <div id="my_recipes">
+        <ul id="recipes_list">
+            {% for r in recipes %}
+
+            <li class="" id="profile_headline{{ind}}">
+                <a class="headline">{{ r[0] }}</a>
+                <a id="btnRemove" class=""><i class="fa fa-trash-o fa-lg"></i></a>
+
+                <div id="profile_recipe" class="">
+                    <p>{{ r[1] }}</p>
+                </div>
+            </li>
+            <p style="display: none;">{{ind=ind+1}}</p>
+            {% end %}
+        </ul>
+    </div>
 
 </body>
 
