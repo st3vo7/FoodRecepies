@@ -14,6 +14,11 @@ class BaseHandler(tornado.web.RequestHandler):
             self.redirect("/profile")
             return
 
+        if self.get_argument("btn2", None) is not None:
+            print("detected click on btn Profile")
+            self.redirect("/")
+            return
+
         if self.get_argument("logout", None) is not None:
             self.clear_cookie("username")
             self.redirect("/")

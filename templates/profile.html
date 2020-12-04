@@ -33,12 +33,17 @@
         <ul id="recipes_list">
             {% for r in recipes %}
 
-            <li class="" id="profile_headline{{ind}}">
+            <li class="" id="my_recipe{{ind}}">
                 <a class="headline">{{ r[0] }}</a>
                 <a id="btnRemove" class=""><i class="fa fa-trash-o fa-lg"></i></a>
 
                 <div id="profile_recipe" class="">
-                    <p>{{ r[1] }}</p>
+                    <div>
+                        <p>{{ r[1] }}</p>
+                        <p> <a style="font-weight: 600;">Time for preparing:</a> {{r[3]}}, for {{r[4]}} persons.</p>
+                        <p><a style="font-weight: 600;">This meal has rating number of: </a> {{r[2]}}</p>
+                        <br>
+                    </div>
                 </div>
             </li>
             <p style="display: none;">{{ind=ind+1}}</p>

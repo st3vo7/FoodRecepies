@@ -28,6 +28,76 @@
 
   }
 
+  fieldset {
+      border-color: rgb(48, 162, 255);
+      border-radius: 1cm;
+      border-style: hidden;
+    }
+
+    .navbar {
+      overflow: hidden;
+      background-color: #33333381;
+      padding: 14px 16px;
+      margin: auto;
+    }
+
+    .navbar a {
+      float: left;
+      color: white;
+      text-align: center;
+      text-decoration: none;
+      margin: auto;
+    }
+
+
+    .dropdown:hover .dropbtn {
+      background-color: rgb(30, 144, 255);
+    }
+
+    .dropdown {
+      float: left;
+      overflow: hidden;
+
+    }
+
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+
+    .dropdown .dropbtn {
+      font-size: 18px;
+      border: none;
+      outline: none;
+      color: white;
+      padding: 14px 16px;
+      background-color: inherit;
+      font-family: inherit;
+      margin: 0px;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: #bbb0b0b7;
+      min-width: 160px;
+      overflow: auto;
+      max-height: 500px;
+
+    }
+
+    .dropdown-content a {
+      float: none;
+      color: black;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      text-align: left;
+    }
+
+    .dropdown-content a:hover {
+      background-color: #dddddd;
+    }
+
 
 
 
@@ -43,7 +113,8 @@
 
   <footer>
     <form method="POST">
-      <button name="btn1" class="btn" id="btnHome"><i class="fa fa-user"></i> Profile </button>
+      <button name="btn2" class="btn" id="btnHome"><i class="fa fa-home"></i> Homepage </button>
+      <button name="btn1" class="btn" id="btnProfile"><i class="fa fa-user"></i> Profile </button>
 <!--      {% module xsrf_form_html() %}-->
     </form>
   </footer>
