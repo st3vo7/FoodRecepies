@@ -37,8 +37,23 @@
                 <a class="headline">{{ r[0] }}</a>
                 <a id="btnRemove" class=""><i class="fa fa-trash-o fa-lg"></i></a>
 
+                <br>
+                <br>
+
+                <div id="ingredients" class="">
+                    <div>
+                        <a style="font-style: italic;">Ingredients:</a>
+                        <p style="display: none;">{{ rix = recipe_ingredients[r[6]] }} </p>
+                        {% for ri in rix %}
+                        <p>{{ri}}</p>
+                        {% end %}
+                    </div>
+                </div>
+                <br>
+
                 <div id="profile_recipe" class="">
                     <div>
+                        <a style="font-style: italic;">Preparation instructions:</a>
                         <p>{{ r[1] }}</p>
                         <p> <a style="font-weight: 600;">Time for preparing:</a> {{r[3]}}, for {{r[4]}} persons.</p>
                         <p><a style="font-weight: 600;">This meal has rating number of: </a> {{r[2]}}</p>

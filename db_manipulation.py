@@ -26,7 +26,8 @@ def create_table():
                     recipe_text TEXT,
                     rating INTEGER,
                     prep_time INTEGER,
-                    persons INTEGER
+                    persons INTEGER,
+                    num_ratings INTEGER
                     )
         """)
 
@@ -110,7 +111,7 @@ def archive_into_db(name, ingredients, content, preparation, persons):
     else:
         cur = conn.cursor()
         try:
-            cur.execute("INSERT INTO recipes(recipe_name, recipe_text, rating, prep_time, persons) VALUES(?, ?, ?, ?, ?)", (name, content, 0, preparation, int(persons)))
+            cur.execute("INSERT INTO recipes(recipe_name, recipe_text, rating, prep_time, persons, num_ratings) VALUES(?, ?, ?, ?, ?, ?)", (name, content, 0, preparation, int(persons), 0))
         except sqlite3.IntegrityError as e:
             print("Trying to write something that already exists in recipes: ", e)
         else:
@@ -167,7 +168,7 @@ def get_all_recipes():
     else:
         cur = conn.cursor()
         try:
-            r = cur.execute("SELECT recipe_name, recipe_text, rating, prep_time, persons FROM recipes")
+            r = cur.execute("SELECT recipe_name, recipe_text, rating, prep_time, persons, num_ratings, recipe_id FROM recipes")
             r = r.fetchall()
         except sqlite3.DatabaseError as e:
             print(e)
@@ -213,8 +214,8 @@ def search_for_name(keywords):
     else:
         cur = conn.cursor()
         try:
-            r = cur.execute("""
-                            SELECT recipe_name, recipe_text, rating, prep_time, persons 
+            r = cur.execute("""  
+                            SELECT recipe_name, recipe_text, rating, prep_time, persons, num_ratings, recipe_id
                             FROM recipes
                             WHERE recipe_name = ?
                             """, (keywords, ))
@@ -229,6 +230,7 @@ def search_for_name(keywords):
 
 def search_for_ingredients(keywords):
     r = None
+
     try:
         conn = sqlite3.connect(DB_NAME)
     except ConnectionRefusedError as e:
@@ -237,12 +239,18 @@ def search_for_ingredients(keywords):
         cur = conn.cursor()
         try:
             # works only for one ingredient
-            r = cur.execute("""
-                                SELECT distinct recipe_name, recipe_text, rating, prep_time, persons 
-                                FROM recipes JOIN recipe_ingredient ri 
-                                ON recipe_id = ri.recipe_id
+            # in order to make it work for multiple recipes, here's general idea
+            # look up for all recipe_ids containing just the first ingredient, and store it. Then
+            # iterate through list of ingredients [2:] and select recipes id
+            # and join with first table of results on recipe_id
+            # So, if recipe contains both ingredients it will stay in the table,
+            # otherwise, it will not.
+            r = cur.execute("""                 
+                                SELECT distinct recipe_name, recipe_text, rating, prep_time, persons, num_ratings, r.recipe_id
+                                FROM recipes r JOIN recipe_ingredient ri 
+                                ON r.recipe_id = ri.recipe_id
                                 JOIN ingredients i on i.ingredient_id = ri.ingredient_id 
-                                WHERE ingredient = keywords?
+                                WHERE ingredient_name = ?
                                 """, (keywords,))
             r = r.fetchall()
         except sqlite3.DatabaseError as e:
@@ -263,9 +271,9 @@ def search_for_text(keywords):
         cur = conn.cursor()
         try:
             r = cur.execute("""
-                                SELECT recipe_name, recipe_text, rating, prep_time, persons 
+                                SELECT recipe_name, recipe_text, rating, prep_time, persons, num_ratings, recipe_id
                                 FROM recipes
-                                WHERE text = ?
+                                WHERE recipe_text = ?
                                 """, (keywords,))
             r = r.fetchall()
         except sqlite3.DatabaseError as e:
@@ -276,4 +284,29 @@ def search_for_text(keywords):
     return r
 
 
+def get_recipe_ingredients(recipe_id):
+    # print("u get_recipe_ingredients sam")
+    r = []
+    try:
+        conn = sqlite3.connect(DB_NAME)
+    except ConnectionRefusedError as e:
+        print(e)
+    else:
+        cur = conn.cursor()
+        try:
+            for row in cur.execute("""
+                            SELECT ingredient_name, ri.quantity, unit 
+                            FROM ingredients i JOIN recipe_ingredient ri
+                            ON i.ingredient_id = ri.ingredient_id
+                            WHERE ri.recipe_id = ? 
+                            """, (recipe_id,)):
+                # print("ironed row: ", " ".join(map(str, row)))
+                r.append(" ".join(map(str, row)))
+            # print(r)
+        except sqlite3.DatabaseError as e:
+            print(e)
+        else:
+            conn.commit()
+            conn.close()
+    return r
 

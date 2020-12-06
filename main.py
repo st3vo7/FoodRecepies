@@ -1,8 +1,7 @@
 from tornado.options import define, options
-
 import os.path
 
-from db_manipulation import *
+
 from recipe_handlers import *
 
 
