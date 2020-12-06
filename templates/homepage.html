@@ -49,8 +49,19 @@
         <ul id="all_recipes_list">
             {% for r in recipes %}
 
-            <li class="" id="all_recipe{{ind}}">
+            <li class="listica" id="all_recipe{{ind}}">
                 <a class="headline">{{ r[0] }}</a>
+
+                <p class="stars">
+                  <span>
+                    <a class="star-1" >1</a>
+                    <a class="star-2" >2</a>
+                    <a class="star-3" >3</a>
+                    <a class="star-4" >4</a>
+                    <a class="star-5" >5</a>
+                  </span>
+                </p>
+
                 <a id="btnRemove" class=""><i class="fa fa-trash-o fa-lg"></i></a>
                 <br>
                 <br>
