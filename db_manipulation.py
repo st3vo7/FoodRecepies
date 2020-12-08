@@ -356,3 +356,31 @@ def count_average(r_id):
             conn.commit()
             conn.close()
     return r
+
+
+def get_minmax_recipes():
+    r = None
+    try:
+        conn = sqlite3.connect(DB_NAME)
+    except ConnectionRefusedError as e:
+        print(e)
+    else:
+        cur = conn.cursor()
+        try:
+            r = cur.execute("""
+                    WITH pom as (
+                        SELECT DISTINCT ri.recipe_id, r.recipe_name, ri.ingredient_id
+                        FROM recipe_ingredient ri JOIN recipes r
+                        ON ri.recipe_id = r.recipe_id
+                        ORDER BY 1)
+                    SELECT recipe_id, recipe_name, count(*) FROM pom
+                    GROUP BY recipe_id
+                    ORDER BY 3
+                            """)
+            r = r.fetchall()
+        except sqlite3.DatabaseError as e:
+            print(e)
+        else:
+            conn.commit()
+            conn.close()
+    return r

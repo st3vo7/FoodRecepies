@@ -115,4 +115,27 @@
         </ul>
     </div>
 
+    <h2>Recipes that use maximum and minimum number of ingredients:</h2>
+
+    <div id="minmax_recipes">
+        <ul id="minmax_list">
+            <li class="" id="max_r{{tops[-1][0]}}">
+                <div id="rec_max" class="">
+                    <div>
+                        <a>Recipe that uses the max number of ingredients is <a style="font-style: italic;"> {{ tops[-1][1] }} </a> and uses <a style="font-weight: 600;">{{ tops[-1][-1] }} </a> ingredients. </a>
+                    </div>
+                </div>
+            </li>
+
+            <li class="" id="min_r{{tops[0][0]}}">
+                <div id="rec_min" class="">
+                    <div>
+                        <a>Recipe that uses min number of ingredients is <a style="font-style: italic;"> {{ tops[0][1] }} </a> and uses <a style="font-weight: 600;">{{ tops[0][-1] }} </a> ingredients. </a>
+                    </div>
+                </div>
+            </li>
+
+        </ul>
+    </div>
+
 {% end %}

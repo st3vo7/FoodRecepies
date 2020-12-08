@@ -12,6 +12,7 @@ class MainHandler(BaseHandler):
 
         rx = get_all_recipes()  # recipe_name, recipe_text, rating, prep_time, persons, num_ratings, recipe_id
         ix = get_top_ingredients()
+        mx = get_minmax_recipes()  # recipe_id, recipe_name, count(*)
 
         # print("r: ", rx)
         ids = []
@@ -26,7 +27,7 @@ class MainHandler(BaseHandler):
             r_i[id1] = r
         # print("r_i:", r_i)
 
-        self.render('homepage.html', recipes=rx, recipe_ingredients=r_i, ingredients=ix)
+        self.render('homepage.html', recipes=rx, recipe_ingredients=r_i, ingredients=ix, tops=mx)
         return
 
     def post(self):
@@ -47,6 +48,7 @@ class MainHandler(BaseHandler):
             # TO-DO: generate page with all of the results
             ix = get_top_ingredients()
 
+            mx = get_minmax_recipes()
             # print("rx:", rx)
 
             ids = []
@@ -62,8 +64,9 @@ class MainHandler(BaseHandler):
                 r_i[id1] = r
             # print("r_i:", r_i)
 
-            self.render('homepage.html', recipes=rx, recipe_ingredients=r_i, ingredients=ix)
+            self.render('homepage.html', recipes=rx, recipe_ingredients=r_i, ingredients=ix, tops=mx)
             return
+
         elif tornado.escape.json_decode(self.request.body):
             dic_data = tornado.escape.json_decode(self.request.body)
             # print(int(dic_data['rating']), int(dic_data['identifier'][-1]))
