@@ -1,6 +1,10 @@
 from base_handler import *
 from db_manipulation import *
 
+import json
+import pprint
+import tornado.escape
+
 
 class MainHandler(BaseHandler):
 
@@ -9,7 +13,7 @@ class MainHandler(BaseHandler):
         rx = get_all_recipes()  # recipe_name, recipe_text, rating, prep_time, persons, num_ratings, recipe_id
         ix = get_top_ingredients()
 
-        print("r: ", rx)
+        # print("r: ", rx)
         ids = []
         for t in rx:
             ids.append(t[6])
@@ -20,44 +24,57 @@ class MainHandler(BaseHandler):
         for id1 in ids:
             r = get_recipe_ingredients(id1)
             r_i[id1] = r
-        print("r_i:", r_i)
+        # print("r_i:", r_i)
 
         self.render('homepage.html', recipes=rx, recipe_ingredients=r_i, ingredients=ix)
         return
 
     def post(self):
-        rx = []
-        category = self.get_argument("category", None)
-        # print(category)
-        keywords = self.get_argument("r_search", None)
-        # print(keywords)
-        if category == "name":
-            rx = search_for_name(keywords)
-        elif category == "ingredients":
-            rx = search_for_ingredients(keywords)
-        elif category == "text":
-            rx = search_for_text(keywords)
 
-        # TO-DO: generate page with all of the results
-        ix = get_top_ingredients()
+        if self.get_argument("category", None) or self.get_argument("r_search", None):
+            rx = []
+            category = self.get_argument("category", None)
+            # print(category)
+            keywords = self.get_argument("r_search", None)
+            # print(keywords)
+            if category == "name":
+                rx = search_for_name(keywords)
+            elif category == "ingredients":
+                rx = search_for_ingredients(keywords)
+            elif category == "text":
+                rx = search_for_text(keywords)
 
-        print("rx:", rx)
+            # TO-DO: generate page with all of the results
+            ix = get_top_ingredients()
 
-        ids = []
-        if rx is not None:
-            for t in rx:
-                ids.append(t[6])
-        print("id-jevi recepata: ", ids)
+            # print("rx:", rx)
 
-        r_i = {}
+            ids = []
+            if rx is not None:
+                for t in rx:
+                    ids.append(t[6])
+            # print("id-jevi recepata: ", ids)
 
-        for id1 in ids:
-            r = get_recipe_ingredients(id1)
-            r_i[id1] = r
-        print("r_i:", r_i)
+            r_i = {}
 
-        self.render('homepage.html', recipes=rx, recipe_ingredients=r_i, ingredients=ix)
-        return
+            for id1 in ids:
+                r = get_recipe_ingredients(id1)
+                r_i[id1] = r
+            # print("r_i:", r_i)
+
+            self.render('homepage.html', recipes=rx, recipe_ingredients=r_i, ingredients=ix)
+            return
+        elif tornado.escape.json_decode(self.request.body):
+            dic_data = tornado.escape.json_decode(self.request.body)
+            # print(int(dic_data['rating']), int(dic_data['identifier'][-1]))
+            r = update_rating(int(dic_data['rating']), int(dic_data['identifier'][-1]))
+            if r is not None:
+                a = count_average(int(dic_data['identifier'][-1]))
+                # print(a)
+                av = round(a[0][0]/(a[0][1]*1.0), 2)
+                self.write(json.dumps({'identifier': dic_data['identifier'], 'avg_rating': av}))
+            else:
+                self.write(json.dumps(None))
 
 
 class ProfileHandler(BaseHandler):

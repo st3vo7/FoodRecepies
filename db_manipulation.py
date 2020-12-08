@@ -310,3 +310,49 @@ def get_recipe_ingredients(recipe_id):
             conn.close()
     return r
 
+
+def update_rating(new_rating, r_id):
+    r = None
+    try:
+        conn = sqlite3.connect(DB_NAME)
+    except ConnectionRefusedError as e:
+        print(e)
+    else:
+        cur = conn.cursor()
+        try:
+            r = cur.execute("""
+                        UPDATE recipes
+                        SET rating = rating + ?, num_ratings = num_ratings + 1
+                        WHERE recipe_id = ?
+                        """, (new_rating, r_id))
+            r = r.fetchall()
+            # print(r)
+        except sqlite3.DatabaseError as e:
+            print(e)
+        else:
+            conn.commit()
+            conn.close()
+    return r
+
+
+def count_average(r_id):
+    r = None
+    try:
+        conn = sqlite3.connect(DB_NAME)
+    except ConnectionRefusedError as e:
+        print(e)
+    else:
+        cur = conn.cursor()
+        try:
+            r = cur.execute("""
+                            SELECT rating, num_ratings
+                            FROM recipes
+                            WHERE recipe_id = ?
+                            """, (r_id,))
+            r = r.fetchall()
+        except sqlite3.DatabaseError as e:
+            print(e)
+        else:
+            conn.commit()
+            conn.close()
+    return r

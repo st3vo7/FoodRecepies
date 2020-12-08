@@ -48,45 +48,47 @@
     <div id="all_recipes">
         <ul id="all_recipes_list">
             {% for r in recipes %}
+                <li class="listica" id="all_recipe{{r[6]}}">
+                    <a class="headline">{{ r[0] }}</a>
 
-            <li class="listica" id="all_recipe{{ind}}">
-                <a class="headline">{{ r[0] }}</a>
+                    <form method="POST">
+                        <p class="stars">
+                          <span>
+                            <a class="star-1" type="submit">1</a>
+                            <a class="star-2" type="submit">2</a>
+                            <a class="star-3" type="submit">3</a>
+                            <a class="star-4" type="submit">4</a>
+                            <a class="star-5" type="submit">5</a>
+                          </span>
+                        </p>
+                    </form>
 
-                <p class="stars">
-                  <span>
-                    <a class="star-1" >1</a>
-                    <a class="star-2" >2</a>
-                    <a class="star-3" >3</a>
-                    <a class="star-4" >4</a>
-                    <a class="star-5" >5</a>
-                  </span>
-                </p>
 
-                <a id="btnRemove" class=""><i class="fa fa-trash-o fa-lg"></i></a>
-                <br>
-                <br>
+                    <a id="btnRemove" class=""><i class="fa fa-trash-o fa-lg"></i></a>
+                    <br>
+                    <br>
 
-                <div id="ingredients" class="">
-                    <div>
-                        <a style="font-style: italic;">Ingredients:</a>
-                        <p style="display: none;">{{ rix = recipe_ingredients[r[6]] }} </p>
-                        {% for ri in rix %}
-                        <p>{{ri}}</p>
-                        {% end %}
+                    <div id="ingredients" class="">
+                        <div>
+                            <a style="font-style: italic;">Ingredients:</a>
+                            <p style="display: none;">{{ rix = recipe_ingredients[r[6]] }} </p>
+                            {% for ri in rix %}
+                            <p>{{ri}}</p>
+                            {% end %}
+                        </div>
                     </div>
-                </div>
-                <br>
+                    <br>
 
-                <div id="all_recipe" class="">
-                    <div>
-                        <a style="font-style: italic;">Preparation instructions:</a>
-                        <p>{{ r[1] }}</p>
-                        <p> <a style="font-weight: 600;">Time for preparing:</a> {{r[3]}}, for {{r[4]}} persons.</p>
-                        <p><a style="font-weight: 600;">This meal has rating number of: </a> {{ r[2]/(r[5]*1.0) if r[5] != 0 else 0 }}</p>
-                        <br>
+                    <div id="all_recipe" class="">
+                        <div>
+                            <a style="font-style: italic;">Preparation instructions:</a>
+                            <p>{{ r[1] }}</p>
+                            <p> <a style="font-weight: 600;">Time for preparing:</a> {{r[3]}}, for {{r[4]}} persons.</p>
+                            <p class="averaged"><a style="font-weight: 600;">This meal has rating number of: </a> {{ round(r[2]/(r[5]*1.0),2) if r[5] != 0 else 0 }}</p>
+                            <br>
+                        </div>
                     </div>
-                </div>
-            </li>
+                </li>
             <p style="display: none;">{{ind=ind+1}}</p>
             {% end %}
         </ul>
