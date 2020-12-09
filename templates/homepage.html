@@ -119,6 +119,7 @@
 
     <div id="minmax_recipes">
         <ul id="minmax_list">
+            {% if tops %}
             <li class="" id="max_r{{tops[-1][0]}}">
                 <div id="rec_max" class="">
                     <div>
@@ -134,6 +135,7 @@
                     </div>
                 </div>
             </li>
+            {% end %}
 
         </ul>
     </div>

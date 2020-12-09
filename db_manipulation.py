@@ -13,9 +13,10 @@ def create_table():
         conn.execute("""
         CREATE TABLE IF NOT EXISTS users (
                     user_id INTEGER PRIMARY KEY,
-                    user_name TEXT,
+                    user_name TEXT NOT NULL,
                     user_surname TEXT,
-                    email TEXT
+                    email TEXT UNIQUE,
+                    password TEXT
                     )
         """)
 
@@ -100,7 +101,7 @@ def fetch_ingredient_id(ingredient):
         return r
 
 
-def archive_into_db(name, ingredients, content, preparation, persons):
+def archive_into_db(name, ingredients, content, preparation, persons, user_id):
 
     li = ingredients.split("\n")
 
@@ -158,8 +159,24 @@ def archive_into_db(name, ingredients, content, preparation, persons):
                         conn.commit()
                         conn.close()
 
+        try:
+            r_id = fetch_recipe_id(name, content)
+            r_id = r_id[0]
+            conn = sqlite3.connect(DB_NAME)
+        except ConnectionRefusedError as e:
+            print(e)
+        else:
+            cur = conn.cursor()
+            try:
+                cur.execute("INSERT INTO user_recipe(user_id, recipe_id) VALUES(?, ?)", (user_id, r_id))
+            except sqlite3.IntegrityError as e:
+                print("Trying to write something that already exists in recipe_ingredient: ", e)
+            else:
+                conn.commit()
+                conn.close()
 
-def get_all_recipes():
+
+def get_all_recipes(user_id):
     r = None
     try:
         conn = sqlite3.connect(DB_NAME)
@@ -168,7 +185,36 @@ def get_all_recipes():
     else:
         cur = conn.cursor()
         try:
-            r = cur.execute("SELECT recipe_name, recipe_text, rating, prep_time, persons, num_ratings, recipe_id FROM recipes")
+            r = cur.execute("""
+                        SELECT r.recipe_name, r.recipe_text, r.rating, r.prep_time, r.persons, r.num_ratings, r.recipe_id 
+                        FROM recipes r JOIN user_recipe ur
+                        ON r.recipe_id = ur.recipe_id
+                        WHERE ur.user_id != ?
+                        """, (user_id, ))
+            r = r.fetchall()
+        except sqlite3.DatabaseError as e:
+            print(e)
+        else:
+            conn.commit()
+            conn.close()
+    return r
+
+
+def get_my_recipes(user_id):
+    r = None
+    try:
+        conn = sqlite3.connect(DB_NAME)
+    except ConnectionRefusedError as e:
+        print(e)
+    else:
+        cur = conn.cursor()
+        try:
+            r = cur.execute(
+                """
+                SELECT distinct r.recipe_name, r.recipe_text, r.rating, r.prep_time, r.persons, r.num_ratings, r.recipe_id 
+                FROM recipes r JOIN user_recipe ur ON r.recipe_id = ur.recipe_id
+                WHERE ur.user_id = ?
+                """, (user_id,))
             r = r.fetchall()
         except sqlite3.DatabaseError as e:
             print(e)
@@ -377,6 +423,70 @@ def get_minmax_recipes():
                     GROUP BY recipe_id
                     ORDER BY 3
                             """)
+            r = r.fetchall()
+        except sqlite3.DatabaseError as e:
+            print(e)
+        else:
+            conn.commit()
+            conn.close()
+    return r
+
+
+def check_for_user(email):
+    r = None
+    try:
+        conn = sqlite3.connect(DB_NAME)
+    except ConnectionRefusedError as e:
+        print(e)
+    else:
+        cur = conn.cursor()
+        try:
+            r = cur.execute("""
+                               SELECT user_id, user_name, user_surname, password
+                               FROM users
+                               WHERE email = ?
+                               """, (email,))
+            r = r.fetchall()
+        except sqlite3.DatabaseError as e:
+            print(e)
+        else:
+            conn.commit()
+            conn.close()
+    return r
+
+
+def register_user(user_name, user_surname, email, password):
+    try:
+        conn = sqlite3.connect(DB_NAME)
+    except ConnectionRefusedError as e:
+        print(e)
+    else:
+        cur = conn.cursor()
+        try:
+            cur.execute(
+                "INSERT INTO users(user_name, user_surname, email, password) VALUES(?, ?, ?, ?)",
+                (user_name, user_surname, email, password))
+        except sqlite3.IntegrityError as e:
+            print("Trying to write something that already exists in recipes: ", e)
+        else:
+            conn.commit()
+            conn.close()
+
+
+def get_name_from_id(id1):
+    r = None
+    try:
+        conn = sqlite3.connect(DB_NAME)
+    except ConnectionRefusedError as e:
+        print(e)
+    else:
+        cur = conn.cursor()
+        try:
+            r = cur.execute("""
+                               SELECT user_name
+                               FROM users
+                               WHERE user_id = ?
+                               """, (id1,))
             r = r.fetchall()
         except sqlite3.DatabaseError as e:
             print(e)

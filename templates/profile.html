@@ -6,19 +6,18 @@
 <body>
 
     <form method="POST">
-        <div style="margin: 0 10px;">
+        <div class="navbar">
             <a href="http://localhost:8000/">
-               <!-- <img src="static/images/logo1.png" alt="FoodRecipes" width="60px" height="55px">-->
+                <img src="static/logo.jpg" alt="FoodRecipes" width="100px" height="100px">
             </a>
 
-            <a style="float: right; margin: 0 10px;"><input type="submit" class="btn" value="Log Out" name="logout"></a>
+            <div style="float: right; margin: 0 10px; padding: 25px 10px;"><i class="fa fa-sign-out" style="font-size:24px" aria-hidden="true"></i><input type="submit" class="btn" value="Log Out" name="logout"></div>
 
-            <a style="float: right;"><input type="submit" class="btn" value="Create new recipe" name="create"></a>
+            <div style="float: right; padding: 25px 10px;"><input type="submit" class="btn" value="Create new recipe" name="create"></div>
 
-            <div style="text-align: center; height: 45px;  float: right;">
-                <p class="">{{ user }}</p>
+            <div style="text-align: center; height: 45px;  float: right; padding: 5px 10px">
+                <h2 class="">{{ user }}</h2>
             </div>
-
         </div>
 
     </form>

@@ -2,17 +2,31 @@ from base_handler import *
 from db_manipulation import *
 
 import json
-import pprint
+import datetime
+# import pprint
 import tornado.escape
+import tornado.web
 
 
 class MainHandler(BaseHandler):
 
+    def prepare(self):
+        super().prepare()
+
     def get(self):
 
-        rx = get_all_recipes()  # recipe_name, recipe_text, rating, prep_time, persons, num_ratings, recipe_id
+        user_id = 0
+        user = self.get_current_user()
+        # print("user: ", user)
+        if user is None:
+            rx = get_all_recipes(0)  # recipe_name, recipe_text, rating, prep_time, persons, num_ratings, recipe_id
+        else:
+            user_id = int(user['user_id'])
+
+        rx = get_all_recipes(user_id)  # recipe_name, recipe_text, rating, prep_time, persons, num_ratings, recipe_id
         ix = get_top_ingredients()
         mx = get_minmax_recipes()  # recipe_id, recipe_name, count(*)
+        # print("mx: ", mx)
 
         # print("r: ", rx)
         ids = []
@@ -85,10 +99,14 @@ class ProfileHandler(BaseHandler):
     def prepare(self):
         super().prepare()
 
-    # @tornado.web.authenticated
+    @tornado.web.authenticated
     def get(self):
 
-        rx = get_all_recipes()
+        user = self.get_current_user()
+        # print("user: ", user)
+        user_id = int(user['user_id'])
+
+        rx = get_my_recipes(user_id)
 
         # print(rx)
         ids = []
@@ -103,7 +121,11 @@ class ProfileHandler(BaseHandler):
             r_i[id1] = r
         print("r_i:", r_i)
 
-        self.render('profile.html', user="", recipes=rx, recipe_ingredients=r_i)
+        user = self.get_current_user()
+        print("user: ", user)
+
+        username = get_name_from_id(int(user['user_id']))[0][0]
+        self.render('profile.html', user=username, recipes=rx, recipe_ingredients=r_i)
 
     def post(self):
         if self.get_argument("create", None) is not None:
@@ -113,6 +135,9 @@ class ProfileHandler(BaseHandler):
 
 
 class CreateHandler(BaseHandler):
+
+    def prepare(self):
+        super().prepare()
 
     def get(self):
         self.render('create.html')
@@ -142,7 +167,48 @@ class CreateHandler(BaseHandler):
         # print(preparation)
         # print(persons)
 
-        archive_into_db(name, ingredients, content, preparation, persons)
+        user = self.get_current_user()
+        # print("user: ", user)
+        user_id = int(user['user_id'])
+
+        archive_into_db(name, ingredients, content, preparation, persons, user_id)
 
         self.redirect("/profile")
         return
+
+
+class LoginHandler(BaseHandler):
+    def get(self):
+        self.render('login.html')
+
+    def post(self):
+
+        user_name = self.get_argument("username", None)
+        print("user_name", user_name)
+        user_surname = self.get_argument("usersurname", None)
+        print("user_surname", user_surname)
+        email = self.get_argument("email", None)
+        print("email", email)
+        password = self.get_argument("password", None)
+        print("password", password)
+
+        registered = check_for_user(email)
+        print("registered: ", registered)
+
+        if not registered:
+            register_user(user_name, user_surname, email, password)
+        else:
+            p = registered[0][3]
+            print("p: ", p)
+            if p != password:
+                self.write('<h1>Wrong credentials</h1>')
+                return
+
+        # print("check_for_user(email)[0][0]: ", (check_for_user(email))[0][0])
+        self.set_secure_cookie("user_id", str((check_for_user(email))[0][0]))
+
+        token = jwt.encode({'user_name': user_name, 'user_id': str((check_for_user(email))[0][0]), 'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24)},
+                           SECRET_KEY)
+        # print("token.decoded: ", json.dumps({'token': token.decode('UTF-8')}))
+        self.set_secure_cookie("token", token.decode('UTF-8'))
+        self.redirect('/profile')

@@ -21,8 +21,8 @@ if __name__ == "__main__":
     settings = {
         "template_path": os.path.join(os.path.dirname(__file__), "templates"),
         "static_path": os.path.join(os.path.dirname(__file__), "static"),
-        # "cookie_secret": "s8iJWyTeSQ+Hfgj59nTy4bFKahPdAEnbhsH5CRuUN1g=",
-        # "login_url": "/login",
+        "cookie_secret": "s8iJWyTeSQ+Hfgj59nTy4bFKahPdAEnbhsH5CRuUN1g=",
+        "login_url": "/login",
         # "db": db,
         "debug": True,
         # "xsrf_cookies": True
@@ -33,6 +33,7 @@ if __name__ == "__main__":
         (r"/", MainHandler),
         (r"/profile", ProfileHandler),
         (r"/create", CreateHandler),
+        (r"/login", LoginHandler),
         ],
         **settings
         )

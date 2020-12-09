@@ -1,6 +1,10 @@
 import tornado.web
 from typing import Optional, Awaitable
 
+import jwt
+
+SECRET_KEY = 'zmd4yAQoTM2VpKwpnJkac2ud5I0U30mDqSLsPq4ZBbI='
+
 
 class BaseHandler(tornado.web.RequestHandler):
 
@@ -20,7 +24,7 @@ class BaseHandler(tornado.web.RequestHandler):
             return
 
         if self.get_argument("logout", None) is not None:
-            self.clear_cookie("username")
+            self.clear_cookie("token")
             self.redirect("/")
             return
 
@@ -29,14 +33,17 @@ class BaseHandler(tornado.web.RequestHandler):
             self.redirect("/signin")
             return
 
-    """
     def get_current_user(self):
-        a = self.get_secure_cookie("username")
+        token = self.get_secure_cookie('token', None)
+        print("token: ", token)
 
-        if a:
-            print('***' * 15)
-            print(a.decode("utf-8"))
-            print('***' * 15)
-            return a.decode("utf-8")
-        return None
-    """
+        if token:
+            try:
+                data = jwt.decode(token, SECRET_KEY)
+            except jwt.DecodeError as e:
+                print("An error occurred while decoding: ", e)
+                return None
+            else:
+                return data
+
+        return token

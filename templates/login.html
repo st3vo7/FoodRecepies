@@ -1,0 +1,53 @@
+{% extends "main.html" %}
+
+{% block body %}
+
+<body>
+
+    <div class="navbar">
+        <a href="http://localhost:8000/">
+            <img src="static/logo.jpg" alt="FoodRecipes" width="60px" height="55px">
+        </a>
+    </div>
+
+    <div id="login-form">
+        <form action="/login" method="POST">
+
+            <p style="font-style: italic; font-weight: 600;">Fill all fields below to register.</p>
+            <fieldset>
+                <div class="input-group margin-bottom-sm">
+                    <span for="username"><i class="fa fa-user fa-fw"></i></span>
+                    <input class="form-control" name="username" type="text" value="" placeholder="Input name">
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <div class="input-group margin-bottom-sm">
+                    <span for="usersurname"><i class="fa fa-user fa-fw"></i></span>
+                    <input class="form-control" name="usersurname" type="text" value="" placeholder="Input surname">
+                </div>
+            </fieldset>
+            <p style="font-style: italic; font-weight: 600;">If you already have an account fields below are enough.</p>
+            <fieldset>
+                <div class="input-group margin-bottom-sm">
+                    <span for="email"><i class="fa fa-envelope fa-fw"></i></span>
+                    <input class="form-control" name="email" type="text" value="" placeholder="Input e-mail address">
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <div class="input-group margin-bottom-sm">
+                    <span for="password"><i class="fa fa-key fa-fw"></i></span>
+                    <input class="form-control" name="password" type="password" value="" placeholder="Input password">
+                </div>
+            </fieldset>
+
+            <input type="submit" class="btn" value="Log In">
+
+        </form>
+    </div>
+    <br>
+
+</body>
+
+{% end %}
