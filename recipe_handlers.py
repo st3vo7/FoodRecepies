@@ -3,9 +3,25 @@ from db_manipulation import *
 
 import json
 import datetime
-# import pprint
+import pprint
+import requests
 import tornado.escape
 import tornado.web
+
+
+def additional_info(email):
+    url = 'https://person-stream.clearbit.com/v2/combined/find?email=' + email
+    r = requests.get(url)
+    pprint.pprint(r.json())
+    return r.json()
+
+
+def examine_user_email(email):
+    url = 'https://api.hunter.io/v2/email-verifier?email='+email+'&api_key='+API_KEY
+    r = requests.get(url)
+    pprint.pprint(r.json())
+    # print(r.json()['data']['status'])
+    return r.json()['data']['status']
 
 
 class MainHandler(BaseHandler):
@@ -18,9 +34,7 @@ class MainHandler(BaseHandler):
         user_id = 0
         user = self.get_current_user()
         # print("user: ", user)
-        if user is None:
-            rx = get_all_recipes(0)  # recipe_name, recipe_text, rating, prep_time, persons, num_ratings, recipe_id
-        else:
+        if user is not None:
             user_id = int(user['user_id'])
 
         rx = get_all_recipes(user_id)  # recipe_name, recipe_text, rating, prep_time, persons, num_ratings, recipe_id
@@ -196,13 +210,29 @@ class LoginHandler(BaseHandler):
         print("registered: ", registered)
 
         if not registered:
+
+            """ HUNTER """
+            v = examine_user_email(email)
+            if v == 'invalid':
+                self.write('<h3>Email invalid. Can not receive messages.</h3>')
+                return
+
             register_user(user_name, user_surname, email, password)
+
         else:
             p = registered[0][3]
             print("p: ", p)
             if p != password:
-                self.write('<h1>Wrong credentials</h1>')
+                self.write('<h3>Wrong credentials</h3>')
                 return
+
+        """Look for additional information about registered user - CLEARBIT"""
+        # TODO: REGISTER ON clearbit.com - require info
+        """
+        ai = additional_info(email)
+        location = ai['person']['location']
+        print('location: ', location)
+        """
 
         # print("check_for_user(email)[0][0]: ", (check_for_user(email))[0][0])
         self.set_secure_cookie("user_id", str((check_for_user(email))[0][0]))

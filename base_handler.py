@@ -4,6 +4,7 @@ from typing import Optional, Awaitable
 import jwt
 
 SECRET_KEY = 'zmd4yAQoTM2VpKwpnJkac2ud5I0U30mDqSLsPq4ZBbI='
+API_KEY = '4925348b1e47840c593327c7a0578ce79d50f4ee'
 
 
 class BaseHandler(tornado.web.RequestHandler):
